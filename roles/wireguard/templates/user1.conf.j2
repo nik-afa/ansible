@@ -1,0 +1,11 @@
+[Interface]
+PrivateKey = {{ user1_privatekey.stdout }}
+Address = 10.0.0.2/32
+ListenPort = 51820
+DNS = 8.8.8.8
+
+[Peer]
+PublicKey = {{ server_pubkey }}
+Endpoint = server.domain.com:51820
+AllowedIPs = 10.0.0.0/8
+PersistentKeepalive = 20

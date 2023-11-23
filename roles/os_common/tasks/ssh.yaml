@@ -1,0 +1,27 @@
+- name: Set hostname in OS
+  ansible.builtin.hostname:
+    name: "{{ inventory_hostname }}"
+
+- name: Set hostname in file
+  ansible.builtin.copy:
+    dest: /etc/hostname
+    content: "{{ inventory_hostname }}"
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Set authorized keys
+  ansible.builtin.template:
+    src: authorized_keys.j2
+    dest: "/home/ubuntu/.ssh/authorized_keys"
+    owner: ubuntu
+    group: ubuntu
+    mode: "0600"
+
+- name: Disable PasswordAuthentication in SSH conf
+  ansible.builtin.lineinfile:
+    dest: "/etc/ssh/sshd_config"
+    regexp: "^PasswordAuthentication"
+    line: "PasswordAuthentication no"
+  notify:
+    - Reload-ssh-service

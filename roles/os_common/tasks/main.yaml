@@ -1,0 +1,4 @@
+- name: Common ssh setting
+  ansible.builtin.import_tasks: ssh.yaml
+- name: Apply firewall rules
+  ansible.builtin.import_tasks: ufw.yaml

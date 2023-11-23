@@ -1,0 +1,11 @@
+### Ubuntu firewall
+- name: Allow SSH in UFW
+  community.general.ufw:
+    rule: allow
+    name: OpenSSH
+
+- name: Set Firewall default policy
+  become: true
+  community.general.ufw:
+    state: enabled
+    policy: reject

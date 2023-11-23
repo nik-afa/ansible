@@ -1,0 +1,71 @@
+- name: Install Wireguard package
+  ansible.builtin.apt:
+    name: wireguard
+    state: present
+    update_cache: true
+
+- name: Enable and persist IP forwarding
+  ansible.posix.sysctl:
+    name: net.ipv4.ip_forward
+    value: "1"
+    state: present
+    sysctl_set: true
+    reload: true
+############################ Create users ############################
+### user1
+- name: Generate user1 keys
+  ansible.builtin.shell: |
+    set -o pipefail
+    umask 077 && wg genkey | tee user1_privatekey | wg pubkey > user1_publickey
+  args:
+    executable: /bin/bash
+    chdir: /etc/wireguard
+    creates: /etc/wireguard/user1_publickey
+
+- name: Get user1 public key
+  ansible.builtin.command: cat /etc/wireguard/user1_publickey
+  register: user1_publickey
+  changed_when: false
+
+- name: Get user1 private key
+  ansible.builtin.command: cat /etc/wireguard/user1_privatekey
+  register: user1_privatekey
+  changed_when: false
+
+### user2
+- name: Generate user2 keys
+  ansible.builtin.shell: |
+    set -o pipefail
+    umask 077 && wg genkey | tee user2_privatekey | wg pubkey > user2_publickey
+  args:
+    executable: /bin/bash
+    chdir: /etc/wireguard
+    creates: /etc/wireguard/user2_publickey
+
+- name: Get user2 public key
+  ansible.builtin.command: cat /etc/wireguard/user2_publickey
+  register: user2_publickey
+  changed_when: false
+
+- name: Get user2 private key
+  ansible.builtin.command: cat /etc/wireguard/user2_privatekey
+  register: user2_privatekey
+  changed_when: false
+
+############################ End create users ############################
+
+- name: Enable on boot Wireguard service
+  ansible.builtin.systemd:
+    name: wg-quick@wg0
+    enabled: true
+
+### create server conf and reload service
+- name: Create server Wireguard config
+  ansible.builtin.template:
+    dest: /etc/wireguard/wg0.conf
+    src: wg0.conf.j2
+    owner: root
+    group: root
+    mode: "0600"
+  notify:
+    - Reload-wg-service

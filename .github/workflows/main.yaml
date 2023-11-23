@@ -1,0 +1,50 @@
+# name: ansible
+
+# on:
+#   push:
+#     branches:
+#       - main
+
+# jobs:
+#   lint:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v4
+#       - name: Run ansible-lint
+#         uses: ansible/ansible-lint@v6.22.0
+#       - name: Slack Notification
+#         uses: act10ns/slack@v2
+#         with:
+#           webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
+#           status: ${{ job.status }}
+#           steps: ${{ toJson(steps) }}
+#           channel: '#notifies'
+#         if: failure()
+#   ansible-playbook:
+#     needs: [lint]
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout
+#         id: checkout
+#         uses: actions/checkout@v4
+#       - name: Run Ansible playbook
+#         uses: dawidd6/action-ansible-playbook@v2
+#         with:
+#           playbook: site.yaml
+#           directory: ./
+#           key: ${{secrets.SSH_ANSIBLE_PRIVATE_KEY}}
+#           # encrypted vault password
+#           vault_password: ${{secrets.ANSIBLE_VAULT_PASSWORD}}
+#           # additional flags to pass to ansible-playbook
+#           options: |
+#             --inventory hosts
+#             --verbose
+#           # -vvvv
+#       - name: Slack Notification
+#         uses: act10ns/slack@v2
+#         with:
+#           webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
+#           status: ${{ job.status }}
+#           steps: ${{ toJson(steps) }}
+#           channel: '#notifies'
+#         if: failure()

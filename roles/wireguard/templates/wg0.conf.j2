@@ -1,0 +1,18 @@
+[Interface]
+Address = 10.0.0.1/24
+ListenPort = 51820
+PrivateKey = {{ server_privkey }}
+
+### Traffic masquerade
+PreUp = iptables -t mangle -A PREROUTING -i wg0 -j MARK --set-mark 0x30
+PreUp = iptables -t nat -A POSTROUTING ! -o wg0 -m mark --mark 0x30 -j MASQUERADE
+PostDown = iptables -t mangle -D PREROUTING -i wg0 -j MARK --set-mark 0x30
+PostDown = iptables -t nat -D POSTROUTING ! -o wg0 -m mark --mark 0x30 -j MASQUERADE
+
+[Peer]
+PublicKey = {{ user1_publickey.stdout }}
+AllowedIPs = 10.0.0.2/32
+
+[Peer]
+PublicKey = {{ user2_publickey.stdout }}
+AllowedIPs = 10.0.0.3/32

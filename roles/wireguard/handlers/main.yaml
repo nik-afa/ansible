@@ -1,0 +1,4 @@
+- name: Reload-wg-service
+  ansible.builtin.service:
+    name: wg-quick@wg0
+    state: reloaded

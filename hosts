@@ -1,0 +1,5 @@
+[prod]
+server.domain.com
+
+[wireguard]
+server.domain.com
